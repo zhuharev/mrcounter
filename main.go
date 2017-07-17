@@ -56,13 +56,15 @@ func main() {
 		for {
 			select {
 			case uri := <-jobChan:
-				count, err := work(uri)
-				if err != nil {
-					log.Fatalln(err)
-				}
-				atomic.AddUint64(&total, count)
-				fmt.Printf("Count for %s: %d\n", uri, count)
-				wg.Done()
+				go func() {
+					count, err := work(uri)
+					if err != nil {
+						log.Fatalln(err)
+					}
+					atomic.AddUint64(&total, count)
+					fmt.Printf("Count for %s: %d\n", uri, count)
+					wg.Done()
+				}()
 			}
 		}
 	}()
